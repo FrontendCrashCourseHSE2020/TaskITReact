@@ -1,6 +1,6 @@
 # ToDo приложение  
-Задача: разобраться в коде и сделать удаление задач.
-Видео: https://yadi.sk/i/KVDfdCA0e7IYlg
+Задача: разобраться в коде и сделать удаление todo-элементов.  
+Видео с пары: https://yadi.sk/i/KVDfdCA0e7IYlg
 
 ## Available Scripts
 
