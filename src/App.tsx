@@ -1,8 +1,13 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Button from 'react-bootstrap/Button';
+import {FormControl, InputGroup} from "react-bootstrap";
+import Container from "react-bootstrap/Container";
+import {InputWithButton} from "./InputWithButton";
+import {TaskComponent} from "./TaskComponent";
 
-class Task {
+export class Task {
 
     id: number;
 
@@ -22,8 +27,6 @@ interface AppState {
 
     tasks: Task[];
 
-    textInput: string;
-
 }
 
 
@@ -32,12 +35,25 @@ export default class App extends React.Component<{}, AppState> {
 
     static CURRENT_ID: number = 0;
 
+    static KEY_DATA: string = "_taskit_data";
+
     constructor(props: Readonly<{}> | {}) {
         super(props);
 
+        let savedJSONTasks: string | null = localStorage.getItem(App.KEY_DATA);
+
+        let initialTasks: Task[] = [];
+
+        if (savedJSONTasks) {
+            initialTasks = JSON.parse(savedJSONTasks);
+        }
+
+        if (initialTasks.length === 0) {
+            initialTasks = [new Task(1, "Buy some milk", new Date())];
+        }
+
         this.state = {
-            tasks: [new Task(1, "Buy some milk", new Date())],
-            textInput: ""
+            tasks: initialTasks
         };
 
         // let numbers = [1, 2, 3, 4];
@@ -47,61 +63,68 @@ export default class App extends React.Component<{}, AppState> {
         // console.log(doubled);
     }
 
-    addNewTask() {
+    addNewTask(textInput: string) {
         let id = App.CURRENT_ID++;
         let date = new Date();
-        let newTask = new Task(id, this.state.textInput, date);
+        let newTask = new Task(id, textInput, date);
 
         this.setState({
             ...this.state,
-            textInput: ''
         });
 
+        let newTasks = [...this.state.tasks, newTask];
+
         this.setState({
-            tasks: [...this.state.tasks, newTask]
+            tasks: newTasks
+        });
+
+        let tasksJSONString = JSON.stringify(newTasks);
+        localStorage.setItem(App.KEY_DATA, tasksJSONString);
+    }
+
+    clearData() {
+        localStorage.setItem(App.KEY_DATA, '');
+        this.setState({
+            ...this.state,
+            tasks: []
         });
     }
 
-    onTaskNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+    removeTask(task: Task) {
+        let index = this.state.tasks.findIndex(t => {
+            return t.id === task.id;
+        });
+
+        this.state.tasks.splice(index, 1);
+
         this.setState({
             ...this.state,
-            textInput: event.target.value
-        });
+            tasks: this.state.tasks
+        })
+
+
+        let tasksJSONString = JSON.stringify(this.state.tasks);
+        localStorage.setItem(App.KEY_DATA, tasksJSONString);
     }
 
     render() {
         return (
-            <main className="py-md-3 pl-md-5">
-                <div className="container">
-                    <div className="input-group mb-3">
+            <div className="py-md-3 pl-md-5">
+                <Container>
+                    <Button className={"col-md-12 mb-3"} variant={"danger"} onClick={() => this.clearData()}>Clear</Button>
 
-                        <input type="text"
-                               value={this.state.textInput}
-                               onChange={event => {this.onTaskNameChange(event)}}
-                               className="form-control" placeholder="Введите задачу"/>
+                    <InputWithButton callback={(text: string) => this.addNewTask(text)}/>
 
-                        <div className="input-group-append">
+                    {
+                        this.state.tasks.map(task => {
+                            return (
+                                <TaskComponent task={task} removeCallback={(task: Task) => this.removeTask(task)}/>
+                            );
+                        })
+                    }
+                </Container>
 
-                            <button className="btn btn-outline-secondary"
-                                type="button" onClick={() => this.addNewTask()}>
-                                Добавить
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-
-                {
-                    this.state.tasks.map(task => {
-                        return (
-                            <div>
-                                {task.description}
-                            </div>
-                        );
-                    })
-                }
-
-            </main>
+            </div>
         );
     }
 
