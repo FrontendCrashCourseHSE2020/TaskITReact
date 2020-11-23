@@ -21,7 +21,11 @@
     "node-sass": "4.13.0",
     "react-bootstrap": "1.4.0"
   },
+  "devDependencies": {
+    "json-server": "0.16.3"
+  },
   "scripts": {
+    "db": "json-server --watch --port 4000 --no-cors server/db.json",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

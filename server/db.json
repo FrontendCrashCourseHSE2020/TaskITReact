@@ -1,0 +1,16 @@
+{
+  "todo": [
+    {
+      "id": 1,
+      "description": "This is first todo (which is stored on server by default)",
+      "creationDate": 9999999999,
+      "author": "admin"
+    },
+    {
+      "description": "Example task",
+      "creationDate": 1606143908642,
+      "author": "admin",
+      "id": 2
+    }
+  ]
+}

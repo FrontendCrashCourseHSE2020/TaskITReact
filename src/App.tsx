@@ -1,27 +1,10 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Button from 'react-bootstrap/Button';
-import {FormControl, InputGroup} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import {InputWithButton} from "./InputWithButton";
 import {TaskComponent} from "./TaskComponent";
-
-export class Task {
-
-    id: number;
-
-    description: string;
-
-    creationDate: Date;
-
-    constructor(id: number, description: string, creationDate: Date) {
-        this.id = id;
-        this.description = description;
-        this.creationDate = creationDate;
-    }
-
-}
+import dataService, {Task} from "./DataService";
 
 interface AppState {
 
@@ -40,33 +23,22 @@ export default class App extends React.Component<{}, AppState> {
     constructor(props: Readonly<{}> | {}) {
         super(props);
 
-        let savedJSONTasks: string | null = localStorage.getItem(App.KEY_DATA);
+        dataService.getTasks().then(value => {
+            value = value ? value : [new Task(1, "Buy some milk", new Date().getTime())];
 
-        let initialTasks: Task[] = [];
-
-        if (savedJSONTasks) {
-            initialTasks = JSON.parse(savedJSONTasks);
-        }
-
-        if (initialTasks.length === 0) {
-            initialTasks = [new Task(1, "Buy some milk", new Date())];
-        }
+            this.setState({
+                tasks: value
+            });
+        });
 
         this.state = {
-            tasks: initialTasks
+            tasks: []
         };
-
-        // let numbers = [1, 2, 3, 4];
-        // let doubled = numbers.map(el => {
-        //     return el * 2;
-        // })
-        // console.log(doubled);
     }
 
-    addNewTask(textInput: string) {
+    async addNewTask(textInput: string) {
         let id = App.CURRENT_ID++;
-        let date = new Date();
-        let newTask = new Task(id, textInput, date);
+        let newTask = new Task(id, textInput, new Date().getTime());
 
         this.setState({
             ...this.state,
@@ -78,33 +50,31 @@ export default class App extends React.Component<{}, AppState> {
             tasks: newTasks
         });
 
-        let tasksJSONString = JSON.stringify(newTasks);
-        localStorage.setItem(App.KEY_DATA, tasksJSONString);
+        await dataService.saveItem(newTask);
     }
 
     clearData() {
-        localStorage.setItem(App.KEY_DATA, '');
         this.setState({
             ...this.state,
             tasks: []
         });
     }
 
-    removeTask(task: Task) {
-        let index = this.state.tasks.findIndex(t => {
-            return t.id === task.id;
-        });
+    async removeTask(task: Task) {
+        if (task.id != null) {
+            await dataService.deleteItem(task.id);
 
-        this.state.tasks.splice(index, 1);
+            let index = this.state.tasks.findIndex(t => {
+                return t.id === task.id;
+            });
 
-        this.setState({
-            ...this.state,
-            tasks: this.state.tasks
-        })
+            this.state.tasks.splice(index, 1);
 
-
-        let tasksJSONString = JSON.stringify(this.state.tasks);
-        localStorage.setItem(App.KEY_DATA, tasksJSONString);
+            this.setState({
+                ...this.state,
+                tasks: this.state.tasks
+            })
+        }
     }
 
     render() {
