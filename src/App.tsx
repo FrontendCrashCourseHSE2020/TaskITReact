@@ -6,20 +6,15 @@ import {FormControl, InputGroup} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import {InputWithButton} from "./InputWithButton";
 import {TaskComponent} from "./TaskComponent";
+import {dataService} from "./DataService";
 
-export class Task {
+export interface Task {
 
-    id: number;
+    id?: number;
 
     description: string;
 
-    creationDate: Date;
-
-    constructor(id: number, description: string, creationDate: Date) {
-        this.id = id;
-        this.description = description;
-        this.creationDate = creationDate;
-    }
+    creationDate: number;
 
 }
 
@@ -33,53 +28,37 @@ interface AppState {
 // React.Component<Props, State>
 export default class App extends React.Component<{}, AppState> {
 
-    static CURRENT_ID: number = 0;
-
     static KEY_DATA: string = "_taskit_data";
 
     constructor(props: Readonly<{}> | {}) {
         super(props);
 
-        let savedJSONTasks: string | null = localStorage.getItem(App.KEY_DATA);
-
-        let initialTasks: Task[] = [];
-
-        if (savedJSONTasks) {
-            initialTasks = JSON.parse(savedJSONTasks);
-        }
-
-        if (initialTasks.length === 0) {
-            initialTasks = [new Task(1, "Buy some milk", new Date())];
-        }
-
-        this.state = {
-            tasks: initialTasks
-        };
-
-        // let numbers = [1, 2, 3, 4];
-        // let doubled = numbers.map(el => {
-        //     return el * 2;
-        // })
-        // console.log(doubled);
-    }
-
-    addNewTask(textInput: string) {
-        let id = App.CURRENT_ID++;
-        let date = new Date();
-        let newTask = new Task(id, textInput, date);
-
-        this.setState({
-            ...this.state,
+        dataService.getAll().then(value => {
+            this.setState({
+                ...this.state,
+                tasks: value
+            })
         });
 
-        let newTasks = [...this.state.tasks, newTask];
+        this.state = {
+            tasks: []
+        };
+    }
+
+    async addNewTask(textInput: string) {
+        let newTask = {
+            id: 0,
+            description: textInput,
+            creationDate: new Date().getTime()
+        };
+
+        let savedObject = await dataService.saveTask(newTask);
+
+        let newTasks = [...this.state.tasks, savedObject];
 
         this.setState({
             tasks: newTasks
         });
-
-        let tasksJSONString = JSON.stringify(newTasks);
-        localStorage.setItem(App.KEY_DATA, tasksJSONString);
     }
 
     clearData() {

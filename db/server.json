@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "description": "Buy some milk",
+      "creationDate": 1606146922709
+    },
+    {
+      "description": "Example task",
+      "creationDate": 1606149096604,
+      "id": 2
+    }
+  ]
+}
