@@ -1,14 +1,34 @@
 {
   "tasks": [
     {
-      "id": 1,
-      "description": "Buy some milk",
-      "creationDate": 1606146922709
+      "description": "Example task",
+      "creationDate": 1593464400000,
+      "id": 1
     },
     {
-      "description": "Example task",
-      "creationDate": 1606149096604,
+      "description": "Buy milk",
+      "creationDate": 1593464400000,
       "id": 2
+    },
+    {
+      "description": "Foo bar",
+      "creationDate": 1593464400000,
+      "id": 3
+    },
+    {
+      "description": "Bar foo",
+      "creationDate": 1592427600000,
+      "id": 4
+    }
+  ],
+  "users": [
+    {
+      "userName": "Semyon",
+      "password": "admin"
+    },
+    {
+      "userName": "Foobar",
+      "password": "qwerty"
     }
   ]
 }

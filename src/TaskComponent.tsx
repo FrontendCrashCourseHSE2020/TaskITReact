@@ -1,8 +1,9 @@
-import {Task} from "./App";
+import {Task} from "./HomeComponent";
 import React from "react";
 import Button from "react-bootstrap/esm/Button";
 import {Row} from "react-bootstrap";
 import Col from "react-bootstrap/Col";
+import {formatUnixTime} from "./Utils";
 
 type RemoveCallback = (task: Task) => void;
 
@@ -12,16 +13,10 @@ export function TaskComponent({task, removeCallback}: {task: Task, removeCallbac
         removeCallback(task);
     }
 
-    let dateTimeFormat = new Intl.DateTimeFormat('ru');
-
-    function formatDate(unixTime: number): string {
-        return dateTimeFormat.format(new Date(unixTime));
-    }
-
     return (
         <Row className={"mb-1"}>
             <Col md={"3"} xs={"12"} sm={"12"}>
-                <span>{formatDate(task.creationDate)}</span>
+                <span>{formatUnixTime(task.creationDate)}</span>
             </Col>
             <Col md={"7"} xs={"12"} sm={"12"}>
                 <span className={"ml-1"}>{task.description}</span>
